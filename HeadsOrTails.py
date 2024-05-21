@@ -9,8 +9,8 @@ while True:
     if face=="q":
         break
     chosen_face = Agn.Face("heads") if face=="h" else Agn.Face("tails")
-    coin.flip()
-    visible_side=coin.get_visible_side()
+    
+    visible_side=coin.flip().get_visible_side()
     print(f"Your choice : {chosen_face.name}")
     print(f"The result  : {visible_side.name}")
     if visible_side.name==chosen_face.name:

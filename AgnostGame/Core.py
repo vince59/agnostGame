@@ -10,9 +10,6 @@ class Element:
     def set_value(self,value):
         self.value=value
         return self
-
-    def get_value(self,value):
-        return self.value
     
     def get_info(self):
         return ({key: value for key, value in self.__dict__.items()})
@@ -52,6 +49,7 @@ class Ensemble(Element):
 
     def add(self,element):
         self.elements.append(element)
+        return self
 
     def get_info(self):
         return ({**super().get_info(),**{'elements':[x.get_info() for x in self.elements]}})
@@ -62,7 +60,7 @@ class Ensemble(Element):
             self.error(message="Value out of limit")
         random_int = random.randint(0, number-1)
         self.active_element=self.elements[random_int]
-        return self.active_element
+        return self
 
 class Face(Element):
     def __init__(self, name):
@@ -83,6 +81,7 @@ class Coin(ThrowableSet):
 
     def flip(self):
         super().random(len(self.elements))
+        return self
 
 class Dice(ThrowableSet):
     def __init__(self, name):
@@ -90,7 +89,8 @@ class Dice(ThrowableSet):
 
     def roll(self):
         super().random(len(self.elements))
-
+        return self
+    
 class StandardDice(Dice):
     def __init__(self, name):
         super().__init__(name)
