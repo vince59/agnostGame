@@ -3,9 +3,13 @@ import random
 import inspect
 
 class Element:
-
     def __init__(self, name):
         self.name=name
+        self.value=0
+
+    def set_value(self,value):
+        self.value=value
+        return self
 
     def get_info(self):
         return ({key: value for key, value in self.__dict__.items()})
@@ -38,10 +42,10 @@ class Element:
         self.log(file,"wrn",message)
 
 class Ensemble(Element):
-
     def __init__(self, name):
         super().__init__(name)
         self.elements=[]
+        self.active_element=None
 
     def add(self,element):
         self.elements.append(element)
@@ -54,8 +58,38 @@ class Ensemble(Element):
         if number<1 or number>nb_elts:
             self.error(message="Value out of limit")
         random_int = random.randint(0, number-1)
-        print(random_int)
-        return self.elements[random_int]
+        self.active_element=self.elements[random_int]
+        return self.active_element
+
+class Face(Element):
+    def __init__(self, name):
+        super().__init__(name)
+
+class Coin(Ensemble):
+    def __init__(self, name,name_face1="",name_face2=""):
+        super().__init__(name)
+        self.add(Face(name_face1))
+        self.add(Face(name_face2))
+
+    def flip(self):
+        super().random(len(self.elements))
+
+    def get_visible_side(self):
+        return self.active_element
+
+class Dice(Ensemble):
+    def __init__(self, name):
+        super().__init__(name)
+
+    def roll(self):
+        super().random(len(self.elements))
+
+class StandardDice(Dice):
+    def __init__(self, name):
+        super().__init__(name)
+        face_name=["one","two","three","four","five","six"]
+        for value, face in enumerate(face_name):
+            self.add(Face(face).set_value(value+1))
 
 class Player(Element):
     def __init__(self, name):
