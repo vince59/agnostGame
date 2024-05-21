@@ -11,6 +11,9 @@ class Element:
         self.value=value
         return self
 
+    def get_value(self,value):
+        return self.value
+    
     def get_info(self):
         return ({key: value for key, value in self.__dict__.items()})
 
@@ -65,7 +68,14 @@ class Face(Element):
     def __init__(self, name):
         super().__init__(name)
 
-class Coin(Ensemble):
+class ThrowableSet(Ensemble):
+    def __init__(self, name):
+        super().__init__(name)
+
+    def get_visible_side(self):
+        return self.active_element
+    
+class Coin(ThrowableSet):
     def __init__(self, name,name_face1="",name_face2=""):
         super().__init__(name)
         self.add(Face(name_face1))
@@ -74,10 +84,7 @@ class Coin(Ensemble):
     def flip(self):
         super().random(len(self.elements))
 
-    def get_visible_side(self):
-        return self.active_element
-
-class Dice(Ensemble):
+class Dice(ThrowableSet):
     def __init__(self, name):
         super().__init__(name)
 
