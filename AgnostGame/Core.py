@@ -42,7 +42,7 @@ class Element:
         self.log(file,"wrn",message)
 
 class Ensemble(Element):
-    def __init__(self, name):
+    def __init__(self, name=None):
         super().__init__(name)
         self.elements=[]
         self.active_element=None
@@ -109,7 +109,14 @@ class Team(Ensemble):
 class Game(Ensemble):
     def __init__(self, name):
         super().__init__(name)
+        self.teams=Ensemble()
+        self.nb_rounds=1
 
-    
-    
+    def next(self):
+        self.nb_rounds+=1
 
+    def get_curr_round(self):
+        return self.nb_rounds
+    
+    def add_team(self,team):
+        self.teams.add(team)
