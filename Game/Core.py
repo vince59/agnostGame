@@ -3,11 +3,22 @@ from .Tools import Tools
 class Face():
     def __init__(self, name):
         self.name=name
+        self.value=0
+
+    def set_value(self,value):
+        self.value=value
+        return self
+    
+    def get_name(self):
+        return self.name
 
 class Faces(Tools):
-    def __init__(self, faces):
+    def __init__(self, faces=[]):
         self.faces=faces
         self.visible_face=None
+
+    def add_face(self,face):
+        self.faces.append(face)
 
     def draw_lots(self):
         self.visible_face=self.random(self.faces)
@@ -27,6 +38,29 @@ class Coin():
 
     def get_visible_face(self):
         return self.faces.get_visible_face()
+
+class Dice():
+    def __init__(self, name=None):
+        self.name=name
+        self.faces=Faces([])
+
+    def add_face(self,face):
+        self.faces.add_face(face)
+        return self
+
+    def roll(self):
+        self.faces.draw_lots()
+        return self
+    
+    def get_visible_face(self):
+        return self.faces.get_visible_face()
+
+class StandardDice(Dice):
+    def __init__(self, name):
+        super().__init__(name)
+        face_name=["one","two","three","four","five","six"]
+        for value, face in enumerate(face_name):
+            self.add_face(Face(face).set_value(value+1))
 
 class Player():
     def __init__(self, name):
