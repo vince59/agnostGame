@@ -1,6 +1,6 @@
-from .Tools import Tools
+import random
 
-class Face():
+class GameElement():
     def __init__(self, name):
         self.name=name
         self.value=0
@@ -9,95 +9,137 @@ class Face():
         self.value=value
         return self
     
+    def set_name(self,value):
+        self.value=value
+        return self
+
     def get_name(self):
         return self.name
+    
+    def get_value(self):
+        return self.value
 
-class Faces(Tools):
-    def __init__(self, faces=[]):
-        self.faces=faces
-        self.visible_face=None
+class GameElements():
+    def __init__(self, name):
+        self.name=name
+        self.elements=[]
 
-    def add_face(self,face):
-        self.faces.append(face)
+    def add(self,element):
+        self.elements.append(element)
 
     def draw_lots(self):
-        self.visible_face=self.random(self.faces)
+        nb_elts=len(self.elements)
+        if nb_elts==0:
+            return None
+        random_int = random.randint(0, nb_elts-1)
+        return(self.elements[random_int])
+
+    def map_on(self,callback):
+        for index, element in enumerate(self.elements):
+            callback(index, element)
+
+    def get_by_number(self,number):
+        if number<1 or number>len(self.elements):
+            return None
+        else:
+            return self.elements[number-1]
+
+    def get_elements(self):
+        return self.elements
+
+class Face(GameElement):
+    def __init__(self, name):
+        super().__init__(name)
+
+class Faces(GameElements):
+    def __init__(self, name):
+        super().__init__(name)
+        self.visible_face=None
+
+    def draw_lots(self):
+        self.visible_face=super().draw_lots()
         return self
     
     def get_visible_face(self):
         return self.visible_face
 
-class Coin():
+class TwoFacesObject(Faces):
     def __init__(self, name=None, face1=None, face2=None):
+        super().__init__(name)
         self.name=name
-        self.faces=Faces([face1,face2])
+        self.add(face1)
+        self.add(face2)
 
     def flip(self):
-        self.faces.draw_lots()
+        self.draw_lots()
         return self
 
-    def get_visible_face(self):
-        return self.faces.get_visible_face()
+class Coin(TwoFacesObject):
+    def __init__(self, name=None, face1=None, face2=None):
+        super().__init__(name, face1, face2)
 
-class Dice():
+class Card(TwoFacesObject):
+    def __init__(self, name=None, face1=None, face2=None):
+        super().__init__(name, face1, face2)
+
+class StandardDeck52Cards(GameElements):
     def __init__(self, name=None):
-        self.name=name
-        self.faces=Faces([])
+        super().__init__(name)
+        sequence=[ f"{i}" for i in range(1,11)] + ["jack", "queen", "king"]
+        colours=["spades", "hearts", "clubs", "diamonds"]
+        for colour in colours:
+            for card in sequence:
+                name=f"{card} of {colour}"
+                self.add(Card(name,Face("back"),Face(name)))
 
-    def add_face(self,face):
-        self.faces.add_face(face)
-        return self
+class Dice(Faces):
+    def __init__(self, name=None):
+        super().__init__(name)
+        self.name=name
 
     def roll(self):
-        self.faces.draw_lots()
+        self.draw_lots()
         return self
-    
-    def get_visible_face(self):
-        return self.faces.get_visible_face()
 
 class StandardDice(Dice):
     def __init__(self, name):
         super().__init__(name)
         face_name=["one","two","three","four","five","six"]
         for value, face in enumerate(face_name):
-            self.add_face(Face(face).set_value(value+1))
+            self.add(Face(face).set_value(value+1))
 
-class Player():
+class Player(GameElement):
     def __init__(self, name):
-        self.name=name
-        self.score=0
-
-    def get_name(self):
-        return self.name
+        super().__init__(name)
 
     def set_score(self,value):
-        self.score=value
+        self.set_value(value)
         return self
     
     def increase_score(self,value):
-        self.score+=value
+        self.set_value(self.get_value()+1)
         return self
 
     def get_score(self):
-        return self.score
+        return self.get_value()
+         
+class Players(GameElements):
+    def __init__(self, name):
+        super().__init__(name)
 
-class Game(Tools):
+class Game():
     def __init__(self, name):
         self.name=name
         self.nb_rounds=1
-        self.players=[]
+        self.players=Players(name)
         self.active_player=None
         self.max_rounds=1
         
     def add_player(self,player):
-        self.players.append(player)
+        self.players.add(player)
 
     def get_player(self,number):
-        nb_elts=len(self.players)
-        if number<1 or number>nb_elts:
-            self.error(message=f"Player {number} not found")
-        else:
-            return self.players[number-1]
+        return self.players.get_by_number(number)
         
     def next(self):
         self.nb_rounds+=1
@@ -123,17 +165,17 @@ class Game(Tools):
     
     def get_players(self):
         return self.players
-    
+
     def map_players(self,callback):
-        self.my_map(self.players,callback)
+        self.players.map_on(callback)
 
     def get_winners(self):
         score=-1
         winners=[]
-        for index, player in enumerate(self.players):
-            if player.score>score:
+        for player in self.players.get_elements():
+            if player.get_score()>score:
                 winners=[player]
-                score=player.score
-            elif player.score==score:
+                score=player.get_score()
+            elif player.get_score()==score:
                 winners.append(player)
         return winners

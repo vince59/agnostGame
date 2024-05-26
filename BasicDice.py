@@ -5,7 +5,8 @@ game=Core.Game("Dice game")
 game.set_max_rounds(4)
 dice=Core.StandardDice("dice")
 for p in range(1,3):
-    game.add_player(Core.Player(input(f"Player {p} name :")))
+    #game.add_player(Core.Player(input(f"Player {p} name :")))
+    game.add_player(Core.Player(f"Player {p}"))
 
 while True:
     print(f"Round #{game.get_curr_round()}/{game.get_max_rounds()}")
@@ -28,14 +29,15 @@ while True:
     # Displays scores
     game.map_players(lambda idx,player: print(f"Player {player.get_name()} score = {player.get_score()}"))
 
-    rep = input("Continue (y/n)? ") 
+    #rep = input("Continue (y/n)? ") 
+    rep="y"
     if rep=="n":
         break
 
     if game.is_last_round():
         break
     game.next()
-    
+
 winners=game.get_winners()
 if len(winners)>1:
     print("You are tied!")

@@ -5,7 +5,8 @@ game=Core.Game("Heads or tails")
 game.set_max_rounds(4)
 coin=Core.Coin("coin",Core.Face("Heads"),Core.Face("Tails"))
 for p in range(1,3):
-    game.add_player(Core.Player(input(f"Player {p} name :")))
+    #game.add_player(Core.Player(input(f"Player {p} name :")))
+    game.add_player(Core.Player(f"Player {p}"))
 
 while True:
     print(f"Round #{game.get_curr_round()}/{game.get_max_rounds()}")
@@ -15,7 +16,8 @@ while True:
         game.set_active_player(game.get_player(2))
 
     # Let player chose
-    face = input(f"{game.get_active_player().get_name()}, your choice ... (h) heads or (t) tails (q) Quit ? ") 
+    #face = input(f"{game.get_active_player().get_name()}, your choice ... (h) heads or (t) tails (q) Quit ? ") 
+    face = "h"
     if face=="q":
         break
     chosen_face = Core.Face("Heads") if face=="h" else Core.Face("Tails")
